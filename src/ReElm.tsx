@@ -46,7 +46,7 @@ export function createModel<Defaults extends Model>(defaults: Defaults): Immutab
 
 export type Update<M extends Model, Msg extends Switchable> = (model: ImmutableModel<M>, msg: Msg) => [ImmutableModel<M>, Cmd<M, Msg>];
 
-export interface NavigateTo<M extends Model, Msg, ComponentProps> {
+export interface NavigateTo<M extends Model, Msg extends Switchable, ComponentProps> {
     type: 'NavigateTo'
     view: React.SFC<ViewProps<M, Msg, ComponentProps>>,
     props: ComponentProps
@@ -65,19 +65,19 @@ export interface NoOp {
 
 export const NoOp: NoOp = { type: 'NoOp' };
 
-export interface BatchCmd<M extends Model, Msg> {
+export interface BatchCmd<M extends Model, Msg extends Switchable> {
     type: 'BatchCmd',
     commands: Cmd<M, Msg>[]
 }
 
-export interface AsyncCmd<M extends Model, Msg, Result> {
+export interface AsyncCmd<M extends Model, Msg extends Switchable, Result> {
     type: 'AsyncCmd',
     promise: Promise<Result>,
     successFunction: (dispatch: Dispatch<Msg>, model: ImmutableModel<M>, result: Result) => [ImmutableModel<M>, Cmd<M, Msg>] | null
     errorFunction?: (dispatch: Dispatch<Msg>, model: ImmutableModel<M>, result: Result) => any
 }
 
-export type Cmd<M extends Model, Msg> =
+export type Cmd<M extends Model, Msg extends Switchable> =
     NavigateTo<M, Msg, any>
     | NoOp
     | BatchCmd<M, Msg>
@@ -85,13 +85,13 @@ export type Cmd<M extends Model, Msg> =
     | AsyncCmd<M, Msg, any>
 
 
-export type Dispatch<Msg> = (msg: Msg | Msg[]) => void;
+export type Dispatch<Msg extends Switchable> = (msg: Msg | Msg[]) => void;
 
 export interface Switchable {
     type: string
 }
 
-export type ViewProps<M extends Model, Msg, ComponentProps> = {
+export type ViewProps<M extends Model, Msg extends Switchable, ComponentProps> = {
     model: ImmutableModel<M>,
     dispatch: Dispatch<Msg>,
     componentProps: ComponentProps
@@ -104,12 +104,12 @@ export interface Program<M extends Model, Msg extends Switchable> {
     renderTarget: HTMLElement
 }
 
-export interface ViewStackframe<M extends Model, Msg, ComponentProps> {
+export interface ViewStackframe<M extends Model, Msg extends Switchable, ComponentProps> {
     view: React.SFC<ViewProps<M, Msg, ComponentProps>>,
     componentProps?: ComponentProps
 }
 
-export type RootViewState<M extends Model, Msg> = {
+export type RootViewState<M extends Model, Msg extends Switchable> = {
     model: ImmutableModel<M>,
     viewStack: List<ViewStackframe<M, Msg, any>>
 };
