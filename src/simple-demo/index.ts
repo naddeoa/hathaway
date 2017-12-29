@@ -1,4 +1,4 @@
-import { Program } from '../ReElm';
+import { Program } from 'reelm-core';
 import { initialValue, CountModel } from './Model';
 import Msg from './Msg';
 import update from './Update';

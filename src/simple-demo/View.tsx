@@ -1,7 +1,7 @@
 import * as React from 'react';
+import { ViewProps, Dispatch } from 'reelm-core';
 import { CountModel } from './Model';
 import Msg from './Msg';
-import { ViewProps, Dispatch } from '../ReElm';
 
 const increment = (dispatch: Dispatch<Msg>) => () => {
     dispatch({ type: 'Increment' });

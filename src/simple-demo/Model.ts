@@ -1,4 +1,4 @@
-import { createModel, ImmutableModel } from '../ReElm';
+import { createModel, ImmutableModel } from 'reelm-core';
 
 export type CountModel = {
     count: number;

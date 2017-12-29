@@ -1,4 +1,4 @@
-import { ImmutableModel, Cmd, NoOp } from '../ReElm';
+import { ImmutableModel, Cmd, NoOp } from 'reelm-core';
 import Msg from './Msg';
 import { CountModel } from './Model';
 

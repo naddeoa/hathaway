@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
 import { List } from 'immutable';
-import { Switchable, RootViewState, RootViewProps, Program, ViewProps, Cmd, ImmutableModel, Model } from './ReElm';
+import { Switchable, RootViewState, RootViewProps, Program, ViewProps, Cmd, ImmutableModel, Model } from 'reelm-core';
 
 function toJS(a: any): {} | string {
     return a.toJS ? a.toJS() : JSON.stringify(a);
