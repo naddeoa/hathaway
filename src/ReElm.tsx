@@ -91,7 +91,7 @@ export interface Switchable {
     type: string
 }
 
-export type ViewProps<M extends Model, Msg extends Switchable, ComponentProps> = {
+export interface ViewProps<M extends Model, Msg extends Switchable, ComponentProps> {
     model: ImmutableModel<M>,
     dispatch: Dispatch<Msg>,
     componentProps: ComponentProps
@@ -109,12 +109,11 @@ export interface ViewStackframe<M extends Model, Msg extends Switchable, Compone
     componentProps?: ComponentProps
 }
 
-export type RootViewState<M extends Model, Msg extends Switchable> = {
+export interface RootViewState<M extends Model, Msg extends Switchable> {
     model: ImmutableModel<M>,
     viewStack: List<ViewStackframe<M, Msg, any>>
 };
 
-export type RootViewProps<M extends Model, Msg extends Switchable> = {
+export interface RootViewProps<M extends Model, Msg extends Switchable> {
     program: Program<M, Msg>
 }
-
