@@ -1,0 +1,34 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "jsx": "react",
+    "module": "es2015",
+    "moduleResolution": "node",
+    "lib": [
+      "esnext",
+      "dom"
+    ],
+    "target": "es2015",
+    "noImplicitAny": true,
+    "strict": true,
+    "strictNullChecks": true,
+    "outDir": "./lib",
+    "preserveConstEnums": true,
+    "removeComments": true,
+    "inlineSourceMap": true,
+    "noImplicitReturns": true,
+    "noImplicitThis": true,
+    "noUnusedParameters": true,
+    "noUnusedLocals": true,
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
+  },
+  "include": [
+    "src/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "**/*-spec.ts"
+  ]
+}
