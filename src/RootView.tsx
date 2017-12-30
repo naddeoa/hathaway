@@ -1,52 +1,67 @@
 import * as React from 'react';
 import * as ReactDom from 'react-dom';
-import { List } from 'immutable';
-import { Switchable, RootViewState, RootViewProps, Program, ViewProps, Cmd, ImmutableModel, Model } from 'reelm-core';
+import { Switchable, RootViewState, RootViewProps, Program, Cmd, ImmutableModel, Model } from 'reelm-core';
 
-function toJS(a: any): {} | string {
-    return a.toJS ? a.toJS() : JSON.stringify(a);
+/**
+ * Print to the console for debugging purposes.
+ * @param a Some object. Probably an ImmutableJS object.
+ */
+function debugLog<Defaults extends Model, Msg extends Switchable>(program: Program<Defaults, Msg>, message: string, a: any) {
+    // Make sure not to call immutable.toJS(). It will slow the application way down really fast.
+    if (program.dev) {
+        const objectMessage = a.toObject ? a.toObject() : JSON.stringify(a);
+        console.log(`${message} -- `, objectMessage);
+    }
 }
 
-class RootView<Defaults extends Model, Msg extends Switchable> extends React.Component<RootViewProps<Defaults, Msg>, RootViewState<Defaults, Msg>>  {
+export interface PlatformSpecificArgs<Msg extends Switchable> {
+    navigationMsg: (event: PopStateEvent) => Msg
+};
+
+class RootView<Defaults extends Model, Msg extends Switchable> extends React.Component<RootViewProps<Defaults, Msg, PlatformSpecificArgs<Msg>>, RootViewState<Defaults>>  {
 
     readonly program: Program<Defaults, Msg>;
+    readonly platformSpecificArgs?: PlatformSpecificArgs<Msg>;
 
-    constructor({ program }: RootViewProps<Defaults, Msg>) {
-        super({ program });
+    state: RootViewState<Defaults>
+
+    constructor({ program, platformSpecificArgs }: RootViewProps<Defaults, Msg, PlatformSpecificArgs<Msg>>) {
+        super({ program, platformSpecificArgs });
         this.program = program;
-        const InitialView: React.SFC<ViewProps<Defaults, Msg, any>> = program.view;
-        this.state = { model: program.init, viewStack: List([{ view: InitialView }]) };
+        this.platformSpecificArgs = platformSpecificArgs;
+        this.state = { model: program.init };
 
         this.processCmd = this.processCmd.bind(this);
         this.dispatch = this.dispatch.bind(this);
-        this.onBack = this.onBack.bind(this);
         this.updateModel = this.updateModel.bind(this);
-        // BackHandler.addEventListener('hardwareBackPress', this.onBack);
-    }
 
-    onBack(): boolean {
-        if (this.state.viewStack.size === 1) {
-            return false;
+        // Only hook into the history api if the user gave us a msg tagger.
+        if (platformSpecificArgs) {
+            this.onBack = this.onBack.bind(this);
+            window.onpopstate = this.onBack;
+            window.history.pushState({ data: program.init }, document.title);
         }
-
-        const viewStack = this.state.viewStack.shift();
-        this.setState({ viewStack });
-        return true
     }
 
-    shouldComponentUpdate(_nextProps: {}, nextState: RootViewState<Defaults, Msg>) {
-        return nextState.model !== this.state.model || nextState.viewStack !== this.state.viewStack;
+    onBack(event: PopStateEvent): void {
+        if (this.platformSpecificArgs) {
+            this.dispatch(this.platformSpecificArgs.navigationMsg(event));
+        }
+    }
+
+    shouldComponentUpdate(_nextProps: {}, nextState: RootViewState<Defaults>) {
+        return nextState.model !== this.state.model;
     }
 
     updateModel(model: ImmutableModel<Defaults>, callback?: () => any) {
         if (model !== this.state.model) {
-            console.log('MODEL CHANGE  -- ', toJS(model));
+            debugLog(this.program, 'MODEL CHANGE', model);
         }
         this.setState({ model }, callback);
     }
 
     dispatch(msg: Msg | Msg[]) {
-        console.log('DISPATCHED MSG --', msg);
+        debugLog(this.program, 'DISPATCHED MSG', msg);
         if (Array.isArray(msg)) {
 
             let updatedModel = this.state.model;
@@ -64,16 +79,11 @@ class RootView<Defaults extends Model, Msg extends Switchable> extends React.Com
     }
 
     processCmd(cmd: Cmd<Defaults, Msg>): boolean {
-        console.log('PROCESSING CMD --', cmd);
+        debugLog(this.program, 'PROCESSING CMD', cmd);
 
         switch (cmd.type) {
             case 'BatchCmd':
-                cmd.commands.forEach(c => this.processCmd(c))
-                return true;
-
-            case 'NavigateTo':
-                const viewStack = this.state.viewStack.unshift({ view: cmd.view, componentProps: cmd.props });
-                this.setState({ viewStack });
+                cmd.commands.forEach((c: Cmd<Defaults, Msg>) => this.processCmd(c))
                 return true;
 
             case 'AsyncModelUpdate':
@@ -99,22 +109,23 @@ class RootView<Defaults extends Model, Msg extends Switchable> extends React.Com
                     }
                 });
                 return true;
+
             case 'NoOp':
                 return true;
+
         }
     }
 
     render() {
-        const { view, componentProps } = this.state.viewStack.first();
-        const CurrentView = view;
+        const CurrentView = this.program.view;
         return (
             <div>
-                <CurrentView dispatch={this.dispatch} model={this.state.model} componentProps={componentProps} />
+                <CurrentView dispatch={this.dispatch} model={this.state.model} componentProps={null} />
             </div>
         );
     }
 }
 
-export function start<M extends Model, Msg extends Switchable>(program: Program<M, Msg>) {
-    ReactDom.render(React.createElement(RootView, { program }), program.renderTarget);
+export function start<M extends Model, Msg extends Switchable>(program: Program<M, Msg>, platformSpecificArgs?: PlatformSpecificArgs<Msg>) {
+    ReactDom.render(React.createElement(RootView, { program, platformSpecificArgs }), program.renderTarget);
 }

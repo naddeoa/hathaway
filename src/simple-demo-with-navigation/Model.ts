@@ -1,14 +1,11 @@
 import { createModel, ImmutableModel } from 'reelm-core';
-import {List} from 'immutable';
 
 export type CountModel = {
-    count: number;
-    history: List<ImmutableModel<CountModel>>
+    pathname: string
 };
 
 const defaultValues = {
-    count: 0,
-    history: List([])
+    pathname: document.location.pathname
 };
 
 export type Model = ImmutableModel<CountModel>;

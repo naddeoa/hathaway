@@ -6,6 +6,10 @@ export interface Decrement {
     type: 'Decrement';
 }
 
-export type Msg = Increment | Decrement;
+export interface Undo {
+    type: 'Undo';
+}
+
+export type Msg = Increment | Decrement | Undo;
 
 export default Msg;

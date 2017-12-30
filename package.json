@@ -28,7 +28,8 @@
     "coverage": "jest --coverage",
     "watch": "npm run build -- --watch",
     "watch:test": "jest --watch",
-    "simple-demo": "concurrently -r 'npm run watch' 'webpack --entry ./lib/simple-demo/index.js --output-filename demo/simple-demo/bundle.js --watch' 'http-server ./demo/simple-demo/'"
+    "simple-demo": "concurrently -r 'npm run watch' 'webpack --entry ./lib/simple-demo/index.js --output-filename demo/simple-demo/bundle.js --watch' 'http-server ./demo/simple-demo/'",
+    "simple-demo-with-navigation": "concurrently -r 'npm run watch' 'webpack --entry ./lib/simple-demo-with-navigation/index.js --output-filename demo/simple-demo-with-navigation/bundle.js --watch' 'http-server ./demo/simple-demo-with-navigation/'"
   },
   "dependencies": {
     "immutable": "^3.8.2",
