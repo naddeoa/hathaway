@@ -14,39 +14,27 @@ function debugLog<Defaults extends Model, Msg extends Switchable>(program: Progr
     }
 }
 
-export interface PlatformSpecificArgs<Msg extends Switchable> {
-    navigationMsg: (event: PopStateEvent) => Msg
-};
-
-class RootView<Defaults extends Model, Msg extends Switchable> extends React.Component<RootViewProps<Defaults, Msg, PlatformSpecificArgs<Msg>>, RootViewState<Defaults>>  {
+class RootView<Defaults extends Model, Msg extends Switchable> extends React.Component<RootViewProps<Defaults, Msg, {}>, RootViewState<Defaults>>  {
 
     readonly program: Program<Defaults, Msg>;
-    readonly platformSpecificArgs?: PlatformSpecificArgs<Msg>;
-
     state: RootViewState<Defaults>
 
-    constructor({ program, platformSpecificArgs }: RootViewProps<Defaults, Msg, PlatformSpecificArgs<Msg>>) {
+    constructor({ program, platformSpecificArgs }: RootViewProps<Defaults, Msg, {}>) {
         super({ program, platformSpecificArgs });
         this.program = program;
-        this.platformSpecificArgs = platformSpecificArgs;
         this.state = { model: program.init };
 
         this.processCmd = this.processCmd.bind(this);
         this.dispatch = this.dispatch.bind(this);
         this.updateModel = this.updateModel.bind(this);
-
-        // Only hook into the history api if the user gave us a msg tagger.
-        if (platformSpecificArgs) {
-            this.onBack = this.onBack.bind(this);
-            window.onpopstate = this.onBack;
-            window.history.pushState({ data: program.init }, document.title);
-        }
     }
 
-    onBack(event: PopStateEvent): void {
-        if (this.platformSpecificArgs) {
-            this.dispatch(this.platformSpecificArgs.navigationMsg(event));
-        }
+    componentWillMount() {
+        this.program.setupCallbacks && this.program.setupCallbacks(this.dispatch);
+    }
+
+    componentWillUnmount() {
+        this.program.setupCallbacks && this.program.setupCallbacks(this.dispatch);
     }
 
     shouldComponentUpdate(_nextProps: {}, nextState: RootViewState<Defaults>) {
@@ -119,13 +107,11 @@ class RootView<Defaults extends Model, Msg extends Switchable> extends React.Com
     render() {
         const CurrentView = this.program.view;
         return (
-            <div>
-                <CurrentView dispatch={this.dispatch} model={this.state.model} componentProps={null} />
-            </div>
+            <CurrentView dispatch={this.dispatch} model={this.state.model} componentProps={null} />
         );
     }
 }
 
-export function start<M extends Model, Msg extends Switchable>(program: Program<M, Msg>, platformSpecificArgs?: PlatformSpecificArgs<Msg>) {
-    ReactDom.render(React.createElement(RootView, { program, platformSpecificArgs }), program.renderTarget);
+export function start<M extends Model, Msg extends Switchable>(program: Program<M, Msg>) {
+    ReactDom.render(React.createElement(RootView, { program }), program.renderTarget);
 }
