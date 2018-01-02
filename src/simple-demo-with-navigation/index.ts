@@ -1,4 +1,4 @@
-import { Program } from 'reelm-core';
+import { Program, Dispatch } from 'reelm-core';
 import { initialValue, CountModel } from './Model';
 import Msg from './Msg';
 import update from './Update';
@@ -14,7 +14,7 @@ if (el) {
         view: View,
         renderTarget: el,
         dev: true,
-        setupCallbacks: function (dispatch) {
+        setupCallbacks: function (dispatch: Dispatch<Msg>) {
             window.onpopstate = (event: PopStateEvent) => dispatch({ type: 'NavigationEvent', event });
         }
     };

@@ -1,4 +1,5 @@
-import { UserProfileModel } from './Model';
+import { UserProfileModel, RepoModel } from './Model';
+import { isNumber } from 'util';
 
 function appendKey(url: string): string {
     return `${url}?client_secret=072b5041986c59c65804831ba94086ea043e04be&client_id=185bde446d817f14681f`;
@@ -40,7 +41,8 @@ export type Repo = {
     fork: boolean,
     open_issues_count: number,
     forks_count: number,
-    watchers: number
+    watchers: number,
+    languages_url: string
 }
 
 function isRepos(a: any): a is Repo[] {
@@ -69,6 +71,34 @@ export async function getUserRepos(profile: UserProfileModel): Promise<Repo[]> {
     });
 
     if (!isRepos(responseJson)) {
+        throw new Error(`Unexpected return object from Github: ${JSON.stringify(responseJson)}`);
+    }
+
+    return responseJson;
+}
+
+
+
+function isProgrammingLanguages(a: any): a is Record<string, number> {
+    const keys = Object.keys(a);
+    if (keys === []) {
+        return true;
+    }
+
+    const someValue = a[keys[0]];
+    return isNumber(someValue);
+}
+
+export type ProgrammingLanguages = {
+    [k: string] : number
+};
+
+export async function getProgrammingLangugesForRepos(repo: RepoModel): Promise<ProgrammingLanguages> {
+    const url = appendKey(repo.get('languages_url'));
+    const response = await fetch(url);
+    const responseJson = await response.json();
+
+    if(!isProgrammingLanguages(responseJson)){
         throw new Error(`Unexpected return object from Github: ${JSON.stringify(responseJson)}`);
     }
 

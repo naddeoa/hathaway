@@ -1,4 +1,4 @@
-import {UserProfileModel} from './Model'
+import { UserProfileModel, RepoModel } from './Model'
 
 export interface OnUsernameSearchChanged {
     type: 'OnUsernameSearchChanged',
@@ -14,6 +14,15 @@ export interface FetchReposForUser {
     user: UserProfileModel
 }
 
-export type Msg = OnUsernameSearch | OnUsernameSearchChanged | FetchReposForUser;
+export interface FetchLanguagesForRepo {
+    type: 'FetchLanguagesForRepo',
+    repo: RepoModel
+}
+
+export type Msg =
+    OnUsernameSearch
+    | OnUsernameSearchChanged
+    | FetchReposForUser
+    | FetchLanguagesForRepo
 
 export default Msg;

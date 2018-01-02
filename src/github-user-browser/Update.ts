@@ -1,7 +1,7 @@
 import { ImmutableModel, Cmd, NoOp } from 'reelm-core';
 import Msg from './Msg';
-import { MyModel, addUserProfile, addRepos, currentlyFetchingRepos, setCurrentlyFetchingRepos, lookupUserProfile } from './Model';
-import { getUserProfile, getUserRepos, UserProfile, Repo } from './GithubApi';
+import { MyModel, addUserProfile, addRepos, currentlyFetchingRepos, setCurrentlyFetchingRepos, lookupUserProfile, addProgammingLanguages, lookupRepos, RepoModel } from './Model';
+import { getUserProfile, getUserRepos, UserProfile, Repo, getProgrammingLangugesForRepos, ProgrammingLanguages } from './GithubApi';
 
 export default function update(model: ImmutableModel<MyModel>, msg: Msg): [ImmutableModel<MyModel>, Cmd<MyModel, Msg>] {
     switch (msg.type) {
@@ -32,6 +32,25 @@ export default function update(model: ImmutableModel<MyModel>, msg: Msg): [Immut
         case 'OnUsernameSearchChanged':
             return [model.set('usernameSearchText', msg.text), NoOp];
 
+        case 'FetchLanguagesForRepo':
+
+            const languagesUpdate: Cmd<MyModel, Msg> = {
+                type: 'AsyncCmd',
+                promise: getProgrammingLangugesForRepos(msg.repo).catch(err => {
+                    console.log(`Can't find programming languages for repo ${msg.repo.get('name')}: ${err}`);
+                    return null;
+                }),
+                successFunction: (_dispatch, newModelState, result: ProgrammingLanguages | null) => {
+                    if (result === null) {
+                        return [newModelState, NoOp];
+                    }
+
+                    return [addProgammingLanguages(msg.repo, result, newModelState), NoOp];
+                }
+
+            }
+            return [model, languagesUpdate];
+
         case 'FetchReposForUser':
             if (currentlyFetchingRepos(msg.user, model)) {
                 // Already a request happening
@@ -39,19 +58,27 @@ export default function update(model: ImmutableModel<MyModel>, msg: Msg): [Immut
             }
 
             const reposUpdate: Cmd<MyModel, Msg> = {
-                type: 'AsyncModelUpdate',
+                type: 'AsyncCmd',
                 promise: getUserRepos(msg.user).catch(reason => {
-                    alert("Can't get repos for user " + model.get('usernameSearchText'));
                     alert(`Can't get repos for user ${model.get('usernameSearchText')}: ${reason}`);
                     return null;
                 }),
-                updateFunction: (newModelState, result: Repo[] | null) => {
+                successFunction: (dispatch, newModelState, result: Repo[] | null) => {
                     const updatedModel = setCurrentlyFetchingRepos(msg.user, false, newModelState);
                     if (result === null) {
-                        return addRepos(msg.user, [], updatedModel);
+                        return [addRepos(msg.user, [], updatedModel), NoOp];
                     }
 
-                    return addRepos(msg.user, result, updatedModel);
+                    // TODO Naming is clearly a problem here
+                    const finalModel = addRepos(msg.user, result, updatedModel);
+                    // Trigger requests for each of the languages breakdowns for each repo
+                    const repoModels = lookupRepos(msg.user, finalModel);
+                    repoModels && repoModels.forEach((repo: RepoModel | undefined) => {
+                        // TODO why does immutable make the argument potentially undefined?
+                        repo && dispatch({ type: 'FetchLanguagesForRepo', repo })
+                    });
+
+                    return [finalModel, NoOp];
                 }
             }
 

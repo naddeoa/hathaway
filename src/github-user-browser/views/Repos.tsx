@@ -1,16 +1,38 @@
 import * as React from 'react';
-import { ViewProps } from 'reelm-core';
-import { MyModel, lookupRepos, RepoModel, lookupUserProfile, currentlyFetchingRepos } from '../Model';
+import { ViewProps, ImmutableModel } from 'reelm-core';
+import { MyModel, lookupRepos, RepoModel, lookupUserProfile, currentlyFetchingRepos, ProgrammingLanguagesModel, lookupProgrammingLanguagesModel } from '../Model';
 import Msg from '../Msg';
 
+function ProgrammingLanguagesView({ languages, repo }: { languages: ProgrammingLanguagesModel | null, repo: RepoModel }) {
+    if (languages === null) {
+        return null;
+    }
 
-function RepoView(repo: RepoModel | undefined) {
+    const languagesUsed: string = languages.reduce(function (reduction, numberOfLines, languageName) {
+        const summary = `${languageName}: ${numberOfLines}`;
+        if (reduction !== '') {
+            return `${reduction}, ${summary}`;
+        }
+        return summary;
+    }, '');
+
+    return (
+        <p key={`${repo.get('id')}-languages`} >{languagesUsed}</p>
+    );
+}
+
+function RepoView({ repo, model }: { repo: RepoModel | undefined, model: ImmutableModel<MyModel> }) {
     if (!repo) {
         return null;
     }
+
+    const languages: ProgrammingLanguagesModel | null = lookupProgrammingLanguagesModel(repo, model);
+
+
     return (
-        <div key={repo.get('id')} className='repo'>
+        <div className='repo'>
             <a target='_blank' href={repo.get('html_url')}> <h2>{repo.get('name')}</h2></a>
+            <ProgrammingLanguagesView languages={languages} repo={repo} />
             <p>{repo.get('description')}</p>
             <ul>
                 {repo.get('fork') && <li className='fork'>fork</li>}
@@ -54,7 +76,7 @@ const View: React.SFC<ViewProps<MyModel, Msg, null>> = ({ model }: ViewProps<MyM
     return (
         <div className='repositories'>
             <h1>Repositories</h1>
-            {repos.map(RepoView)}
+            {repos.map(repo => <RepoView repo={repo} model={model} key={repo === undefined ? 'remove-when-immutable4-released' : repo.get('id')} />)}
         </div>
     );
 }

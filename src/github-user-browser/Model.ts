@@ -1,6 +1,6 @@
 import { createModel, ImmutableModel } from 'reelm-core';
 import { Map, List } from 'immutable';
-import { UserProfile, Repo } from './GithubApi';
+import { UserProfile, Repo, ProgrammingLanguages } from './GithubApi';
 
 export function addUserProfile(username: string, profile: UserProfile, model: ImmutableModel<MyModel>): ImmutableModel<MyModel> {
     return model.set('userProfiles', model.get('userProfiles').set(username, createModel(profile)));
@@ -36,6 +36,7 @@ export function addRepos(profile: UserProfileModel, repos: Repo[], model: Immuta
 }
 
 export function lookupRepos(profile: UserProfileModel, model: ImmutableModel<MyModel>): ReposModel | null {
+    // TODO make this one line
     const repos = model.get('repos').get(profile.get('id'));
 
     if (!repos) {
@@ -45,18 +46,30 @@ export function lookupRepos(profile: UserProfileModel, model: ImmutableModel<MyM
     return repos;
 }
 
+export function addProgammingLanguages(repo: RepoModel, languages: ProgrammingLanguages, model: ImmutableModel<MyModel>): ImmutableModel<MyModel> {
+    const updatedProgrammingLanguagesModel = model.get('programmingLanguages').set(repo.get('id'), Map(languages));
+    return model.set('programmingLanguages', updatedProgrammingLanguagesModel);
+}
+
+export function lookupProgrammingLanguagesModel(repo: RepoModel, model: ImmutableModel<MyModel>): ProgrammingLanguagesModel | null {
+    return model.get('programmingLanguages').get(repo.get('id')) || null;
+}
+
 export type UserProfileModel = ImmutableModel<UserProfile>;
 
 export type RepoModel = ImmutableModel<Repo>;
 
 export type ReposModel = List<RepoModel>;
 
+export type ProgrammingLanguagesModel = Map<string, number>;
+
 export type MyModel = {
     usernameSearchText: string,
     showProfile: string | null,
     userProfiles: Map<string, UserProfileModel>,
     repos: Map<string, ReposModel>,
-    fetchingReposForProfile: Map<string, boolean>
+    fetchingReposForProfile: Map<string, boolean>,
+    programmingLanguages: Map<string, ProgrammingLanguagesModel>
 };
 
 const defaultValues = {
@@ -64,7 +77,8 @@ const defaultValues = {
     showProfile: null,
     userProfiles: Map<string, UserProfileModel>(),
     repos: Map<string, ReposModel>(),
-    fetchingReposForProfile: Map<string, boolean>()
+    fetchingReposForProfile: Map<string, boolean>(),
+    programmingLanguages: Map<string, Map<string, number>>()
 };
 
 export type Model = ImmutableModel<MyModel>;
