@@ -1,16 +1,19 @@
 {
-  "name": "reelm",
-  "version": "0.0.0",
-  "description": "reelm",
+  "name": "hathaway",
+  "version": "0.0.1",
+  "description": "Main package for the web version of the hathaway library.",
   "license": "MIT",
-  "repository": "",
+  "repository": "https://github.com/naddeoa/hathaway",
   "author": {
-    "name": "",
-    "email": "",
-    "url": ""
+    "name": "Anthony Naddeo",
+    "email": "anthony.naddeo@gmail.com",
+    "url": "https://github.com/naddeoa/hathaway"
   },
   "keywords": [
-    ""
+    "react",
+    "hathaway",
+    "minimal",
+    "simple"
   ],
   "files": [
     "lib"
@@ -27,12 +30,10 @@
     "test": "jest",
     "coverage": "jest --coverage",
     "watch": "npm run build -- --watch",
-    "watch:test": "jest --watch",
-    "simple-demo": "concurrently -r 'npm run watch' 'webpack --entry ./lib/simple-demo/index.js --output-filename demo/simple-demo/bundle.js --watch' 'http-server -d false ./demo/simple-demo/'",
-    "github-user-browser": "concurrently -r 'npm run watch' 'webpack --entry ./lib/github-user-browser/index.js --output-filename demo/github-user-browser/bundle.js --watch' 'http-server -d false ./demo/github-user-browser/'",
-    "simple-demo-with-navigation": "concurrently -r 'npm run watch' 'webpack --entry ./lib/simple-demo-with-navigation/index.js --output-filename demo/simple-demo-with-navigation/bundle.js --watch' 'http-server ./demo/simple-demo-with-navigation/'"
+    "watch:test": "jest --watch"
   },
   "dependencies": {
+    "hathaway-core": "0.0.1"
   },
   "devDependencies": {
     "@types/immutable": "^3.8.7",
