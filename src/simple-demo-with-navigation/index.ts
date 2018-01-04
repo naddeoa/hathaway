@@ -3,7 +3,7 @@ import { initialValue, CountModel } from './Model';
 import Msg from './Msg';
 import update from './Update';
 import View from './View';
-import { start } from '../RootView';
+import { start } from '../';
 
 const el = document.getElementById('react-root');
 

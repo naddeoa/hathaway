@@ -33,16 +33,13 @@
     "simple-demo-with-navigation": "concurrently -r 'npm run watch' 'webpack --entry ./lib/simple-demo-with-navigation/index.js --output-filename demo/simple-demo-with-navigation/bundle.js --watch' 'http-server ./demo/simple-demo-with-navigation/'"
   },
   "dependencies": {
-    "immutable": "^3.8.2",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
   },
   "devDependencies": {
     "@types/immutable": "^3.8.7",
     "@types/jest": "^20.0.5",
     "@types/node": "^8.0.0",
-    "@types/react": "^16.0.31",
     "@types/react-dom": "^16.0.3",
+    "immutable": "^3.8.2",
     "concurrently": "^3.5.1",
     "coveralls": "^2.0.0",
     "http-server": "^0.10.0",
@@ -55,7 +52,14 @@
     "tslint": "^5.0.0",
     "tslint-config-prettier": "^1.1.0",
     "typescript": "^2.3.0",
-    "webpack": "^3.10.0"
+    "webpack": "^3.10.0",
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0"
+  },
+  "peerDependencies": {
+    "react": "^16.0.0",
+    "react-dom": "^16.0.0",
+    "immutable": "^3.8.2"
   },
   "engines": {
     "node": ">=6.0.0"

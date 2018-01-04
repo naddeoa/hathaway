@@ -4,6 +4,7 @@ import { MyModel, addUserProfile, addRepos, currentlyFetchingRepos, setCurrently
 import { getUserProfile, getUserRepos, UserProfile, Repo, getProgrammingLangugesForRepos, ProgrammingLanguages } from './GithubApi';
 
 export default function update(model: ImmutableModel<MyModel>, msg: Msg): [ImmutableModel<MyModel>, Cmd<MyModel, Msg>] {
+
     switch (msg.type) {
         case 'OnUsernameSearch':
             const asyncUpdate: Cmd<MyModel, Msg> = {

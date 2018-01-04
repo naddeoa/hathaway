@@ -81,7 +81,7 @@ export async function getUserRepos(profile: UserProfileModel): Promise<Repo[]> {
 
 function isProgrammingLanguages(a: any): a is Record<string, number> {
     const keys = Object.keys(a);
-    if (keys === []) {
+    if (keys.length === 0) {
         return true;
     }
 
