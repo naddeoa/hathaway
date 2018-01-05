@@ -33,7 +33,7 @@
     "watch:test": "jest --watch"
   },
   "dependencies": {
-    "hathaway-core": "0.0.1"
+    "hathaway-core": "^0.0.3"
   },
   "devDependencies": {
     "@types/immutable": "^3.8.7",
