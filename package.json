@@ -1,6 +1,6 @@
 {
   "name": "hathaway",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Main package for the web version of the hathaway library.",
   "license": "MIT",
   "repository": "https://github.com/naddeoa/hathaway",
@@ -33,7 +33,7 @@
     "watch:test": "jest --watch"
   },
   "dependencies": {
-    "hathaway-core": "0.0.6"
+    "hathaway-core": "0.0.9"
   },
   "devDependencies": {
     "@types/immutable": "^3.8.7",
